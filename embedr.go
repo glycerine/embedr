@@ -67,7 +67,10 @@ func EndR() {
 
 var RevalErr = fmt.Errorf("RevalErr")
 
-func EvalR(script string) (iface interface{}, err error) {
+// Getting the full value back can be large and thus slow
+// and use alot of memory in iface. Prefer EvarR below
+// unless it is really needed.
+func EvalR_fullback(script string) (iface interface{}, err error) {
 
 	var evalErrorOccurred C.int
 	res := C.callParseEval(C.CString(script), &evalErrorOccurred)
@@ -89,11 +92,11 @@ func EvalR(script string) (iface interface{}, err error) {
 	return
 }
 
-// EvalR_quick never returns the value of the script.
+// EvalR never returns the value of the script.
 // Therefore it avoids getting very large amounts
 // of data back after assigning large data
 // to a variable in R.
-func EvalR_quick(script string) (err error) {
+func EvalR(script string) (err error) {
 
 	var evalErrorOccurred C.int
 	res := C.callParseEval(C.CString(script), &evalErrorOccurred)
