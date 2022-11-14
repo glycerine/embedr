@@ -88,3 +88,30 @@ func EvalR(script string) (iface interface{}, err error) {
 	}
 	return
 }
+
+// getValue allows us to NOT ask for the value
+// back, and thus avoid getting very large amounts
+// of data back after assigning large data
+// to a variable in R. If getValue is false, then
+// the returned iface will always be nil.
+func EvalR_quick(script string, getValue bool) (iface interface{}, err error) {
+
+	var evalErrorOccurred C.int
+	res := C.callParseEval(C.CString(script), &evalErrorOccurred)
+	if evalErrorOccurred != 0 {
+		// if needed, dig in and figure out how to
+		// get the error. For now it may be enough
+		// to get note there was either a parse or
+		// an evaluation error.
+		return nil, RevalErr
+	}
+	if evalErrorOccurred == 0 && res != C.R_NilValue && getValue {
+		C.Rf_protect(res)
+		// do stuff here:
+		iface = SexpToIface(res)
+		//fmt.Printf("\n Embedding R in Golang example: I got back from evaluating script:\n")
+		//goon.Dump(iface)
+		C.Rf_unprotect(1) // unprotect res
+	}
+	return
+}
