@@ -300,8 +300,11 @@ extern "C" {
     return evalres;
   }
 
-  // This works once a R_ReplDLLinit() / R_ReplDLLdo1() loop
-  // has started, but not before.
+  // This works for the callbacks in a R_ReplDLLinit() / R_ReplDLLdo1() loop
+  // and the registration can happen before the R_ReplDLLinit(), but
+  // no callbacks will happen on simple DLL Rf_Eval()s, only on the
+  // R_ReplDLLdo1() that are used in embedr.go SimpleREPL() to build
+  // a REPL loop.
   // 
   // MyEmbedrToplevelCallback is an example of a function that is
   // registered using Rf_addTaskCallback() to get called after
@@ -313,17 +316,16 @@ extern "C" {
   // If they return FALSE then they are deregistered and not called again.
   // If they return TRUE then they will be called after the next toplevel
   // task completes.
-  int callcount = 0;
+  //
   Rboolean MyEmbedrToplevelCallback(SEXP expr,
                                     SEXP value,
                                     Rboolean succeeded,
                                     Rboolean visible,
                                     void * data) {
 
-    PrintToR("embedr.cpp: MyEmbedrToplevelCallback() has been called!\n");     
+    //PrintToR("embedr.cpp: MyEmbedrToplevelCallback() has been called!\n");     
     
-    callcount++;
-    printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+    //printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
     //fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
     if (succeeded) {
       
@@ -334,24 +336,14 @@ extern "C" {
       // 0 the pointer after reading it.
       free(lastSucessExpression); 
       lastSucessExpression = strdup(x);
-      printf("succeeded: '%s'\n", x);
+      //printf("succeeded: '%s'\n", x);
     }
-    
-    if (callcount < 5) {
-      return TRUE;
-    } else {
-       return FALSE; // only take one callback to start.
-    }
+    // keep calling us for each toplevel, FALSE would unregister the callback.
+    return TRUE;
   }
 
   long RegisterMyEmbedrToplevelCallback() {
     int mynum = 0;
-
-    // worked:
-    //char *str = strdup("[prompt] ");
-    //Rf_addTaskCallback(MyEmbedrToplevelCallback, str, free, "MyEmbedrToplevelCallback", &mynum);
-
-    // simpler:
     Rf_addTaskCallback(MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", &mynum);
     return long(mynum);
   }

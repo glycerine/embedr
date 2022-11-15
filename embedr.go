@@ -13,6 +13,7 @@ import "C"
 
 import (
 	"fmt"
+	"sync"
 	//"github.com/shurcooL/go-goon"
 )
 
@@ -121,7 +122,18 @@ func EvalR(script string) (err error) {
 	return nil
 }
 
+var mutTaskCallback sync.Mutex
+var taskCallBackInitDone bool
+
 func topTaskCallback() {
+	// only Register once!
+	mutTaskCallback.Lock()
+	defer mutTaskCallback.Unlock()
+	if taskCallBackInitDone {
+		return
+	}
+	taskCallBackInitDone = true
+
 	num := C.RegisterMyEmbedrToplevelCallback()
 	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
 }
