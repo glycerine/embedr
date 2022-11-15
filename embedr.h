@@ -23,6 +23,13 @@
 extern "C" {
 #endif
 
+  // Not in the usualy .h, so how are we to get to them?
+  // from src/main/deparse.c
+  //      src/include/Defn.h
+  SEXP Rf_deparse1line_(SEXP call, Rboolean abbrev, int opts);
+  SEXP Rf_deparse1line(SEXP call, Rboolean abbrev);
+  SEXP Rf_deparse1(SEXP call, Rboolean abbrev, int opts);
+  
 int Rf_isProtected(SEXP s); // debugging utility from R-3.x.x/src/main/memory.c
   
 unsigned long int get_starting_signint_handler();

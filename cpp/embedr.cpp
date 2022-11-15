@@ -320,9 +320,20 @@ extern "C" {
     PrintToR("embedr.cpp: MyEmbedrToplevelCallback() has been called!\n");     
     
     callcount++;
-    printf("MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
-    fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
-
+    printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+    //fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+    if (succeeded) {
+      /*
+      deparse(expr);
+	    SEXP u = deparse1(CAR(expr), 0, SIMPLEDEPARSE);
+	    error(_("Function '%s' is not in the derivatives table"),
+		  translateChar(STRING_ELT(u, 0)));
+      
+      */
+      const char* x = CHAR(STRING_ELT(Rf_deparse1line(expr, FALSE), 0));
+      printf("succeeded: '%s'\n", x);
+    }
+    
     if (callcount < 5) {
       return TRUE;
     } else {
@@ -332,8 +343,13 @@ extern "C" {
 
   long RegisterMyEmbedrToplevelCallback() {
     int mynum = 0;
-    char *str = strdup("[prompt] ");
-    Rf_addTaskCallback(MyEmbedrToplevelCallback, str, free, "MyEmbedrToplevelCallback", &mynum);
+
+    // worked:
+    //char *str = strdup("[prompt] ");
+    //Rf_addTaskCallback(MyEmbedrToplevelCallback, str, free, "MyEmbedrToplevelCallback", &mynum);
+
+    // simpler:
+    Rf_addTaskCallback(MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", &mynum);
     return long(mynum);
   }
 
