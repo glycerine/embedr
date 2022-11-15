@@ -16,7 +16,10 @@
 
 #include "../embedr.h"
 
-
+// the last successfully evaluated expression from the Toplevel callback
+// The Go code should free() this after copying it, as it was made with
+// strdup(), and then set it to 0;
+char* lastSucessExpression = 0;
 
 #ifdef __cplusplus
 extern "C" {
@@ -323,14 +326,14 @@ extern "C" {
     printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
     //fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
     if (succeeded) {
-      /*
-      deparse(expr);
-	    SEXP u = deparse1(CAR(expr), 0, SIMPLEDEPARSE);
-	    error(_("Function '%s' is not in the derivatives table"),
-		  translateChar(STRING_ELT(u, 0)));
       
-      */
       const char* x = CHAR(STRING_ELT(Rf_deparse1line(expr, FALSE), 0));
+
+      // if not already freed, don't leak now.
+      // free(0) is a no-op. Go side should
+      // 0 the pointer after reading it.
+      free(lastSucessExpression); 
+      lastSucessExpression = strdup(x);
       printf("succeeded: '%s'\n", x);
     }
     

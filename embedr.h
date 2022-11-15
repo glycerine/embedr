@@ -23,6 +23,12 @@
 extern "C" {
 #endif
 
+  // the last successfully evaluated expression from the Toplevel callback
+  // The Go code should free() this after copying it, as it was made with
+  // strdup(), and then set it to 0;
+  // defined in cpp/embedr.cpp
+  extern char* lastSucessExpression;
+  
   // Not in the usualy .h, so how are we to get to them?
   // from src/main/deparse.c
   //      src/include/Defn.h
