@@ -126,7 +126,8 @@ func DemoTaskCallback() {
 	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
 }
 
-// or run_Rmainloop(); but this is nice in that we get control back
+// or run_Rmainloop(); but one-step R_ReplDLLdo1() is nice
+// in that we get control back
 // after each top level something (command?)
 // https://cran.r-project.org/doc/manuals/R-exts.html#index-Rf_005finitEmbeddedR
 // section 8.1
