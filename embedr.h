@@ -81,7 +81,8 @@ unsigned long int get_signint_handler();
 
   void callEndEmbeddedR();
 
-  void RegisterMyEmbedrToplevelCallback();
+  // The embedded DLL does not do these top level action callbacks.
+  //long RegisterMyEmbedrToplevelCallback();
 
 #ifdef __cplusplus
 }

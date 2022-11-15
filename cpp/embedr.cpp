@@ -297,6 +297,8 @@ extern "C" {
     return evalres;
   }
 
+  /* The DLL does not do these Rf_addTaskCallback() callbacks.
+
   // MyEmbedrToplevelCallback is an example of a function that is
   // registered using Rf_addTaskCallback() to get called after
   // each toplevel R action.
@@ -307,19 +309,33 @@ extern "C" {
   // If they return FALSE then they are deregistered and not called again.
   // If they return TRUE then they will be called after the next toplevel
   // task completes.
+  int callcount = 0;
   Rboolean MyEmbedrToplevelCallback(SEXP expr,
                                     SEXP value,
                                     Rboolean succeeded,
                                     Rboolean visible,
                                     void * data) {
+
+    PrintToR("embedr.cpp: MyEmbedrToplevelCallback() has been called!\n");     
     
-    printf("MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d\n", succeeded);
-    return FALSE; // only take one callback to start.
+    callcount++;
+    printf("MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+    fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+
+    if (callcount < 5) {
+      return TRUE;
+    } else {
+       return FALSE; // only take one callback to start.
+    }
   }
 
-  void RegisterMyEmbedrToplevelCallback() {
-    Rf_addTaskCallback(&MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", NULL);
+  long RegisterMyEmbedrToplevelCallback() {
+    int mynum = 0;
+    char *str = strdup("[prompt] ");
+    Rf_addTaskCallback(MyEmbedrToplevelCallback, str, free, "MyEmbedrToplevelCallback", &mynum);
+    return long(mynum);
   }
+  */
   
 #ifdef __cplusplus
 }
