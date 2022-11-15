@@ -139,8 +139,10 @@ func SimpleREPL() {
 	for {
 		did := C.R_ReplDLLdo1()
 		vv("back from one call to R_ReplDLLdo1(); did = %v\n", did)
-		if did == 0 {
+		if did <= 0 {
 			break
 		}
+		// did == 0 => error evaluating
+		// did == -1 => ctrl-d (end of file).
 	}
 }
