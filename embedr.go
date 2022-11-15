@@ -18,7 +18,7 @@ import (
 )
 
 // as separate functions for using rmqcb as a library
-func InitR() {
+func InitR(repl bool) {
 	C.record_sigaction_to_current_act() // save Go's sigaction
 
 	// WOW. Discovered by not acted upon yet: there is a way
@@ -32,7 +32,13 @@ func InitR() {
 	// variable R_SignalHandlers (declared in Rinterface.h) to 0."
 
 	// R will change some signal handlers, for SIGPIPE; maybe others.
-	C.callInitEmbeddedR()
+
+	if repl {
+		C.callInitEmbeddedREPL()
+	} else {
+		// quiet, no prompt.
+		C.callInitEmbeddedR()
+	}
 
 	// begin debug exper
 	/*

@@ -85,9 +85,13 @@ unsigned long int get_signint_handler();
   unsigned long long next_newline_pos(SEXP raw, unsigned long long beg, unsigned long long endx);
   
   unsigned char* get_raw_elt_ptr(SEXP raw, unsigned long long i);  
-  
+
+  // Must only call one or other of the init functions; and only once.  
   void callInitEmbeddedR();
 
+  // Must only call one or other of the init functions; and only once.  
+  void callInitEmbeddedREPL();
+  
   // PRE: callInitEmbeddedR() has been called exactly once before entering.
   // IMPORTANT: caller must PROTECT the returned SEXP and unprotect when done. Unless it is R_NilValue.
   SEXP callParseEval(const char* evalme, int* evalErrorOccurred);

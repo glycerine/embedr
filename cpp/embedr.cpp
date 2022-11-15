@@ -244,9 +244,17 @@ extern "C" {
     }
     return endx;
   }
-  
+
+  // Must only call one or other of the init functions; and only once.
+  void callInitEmbeddedREPL() {
+    char *my_argv[]= {(char*)"repl"};
+    Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
+  }
+
+  // Must only call one or other of the init functions; and only once.  
   void callInitEmbeddedR() {
-	char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
+    // designed to be as quiet as possible, when really embedded.
+    char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
   }
 
