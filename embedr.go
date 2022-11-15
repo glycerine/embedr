@@ -122,25 +122,28 @@ func EvalR(script string) (err error) {
 	return nil
 }
 
-var mutTaskCallback sync.Mutex
-var taskCallBackInitDone bool
+var mutInit sync.Mutex
+var initDone bool
 
-func RegisterGetLastTopExpression() int {
-	// only Register once!
-	mutTaskCallback.Lock()
-	defer mutTaskCallback.Unlock()
-	if taskCallBackInitDone {
-		return -1
-	}
-	taskCallBackInitDone = true
-
+// setup to retreive the lastexp from the top level callback, if it succeeded.
+// allows Lastexpr() to work.
+func registerGetLastTopExpression() int {
 	num := C.RegisterMyEmbedrToplevelCallback()
 	//fmt.Printf("topTaskCallback registered and got num = %v\n", num)
 	return int(num)
 }
 
 func ReplDLLinit() {
+	// only Register once!
+	mutInit.Lock()
+	defer mutInit.Unlock()
+	if initDone {
+		return
+	}
+	initDone = true
+
 	C.R_ReplDLLinit()
+	registerGetLastTopExpression()
 }
 func ReplDLLdo1() int {
 	return int(C.R_ReplDLLdo1())
@@ -167,9 +170,6 @@ func Lastexpr() string {
 //  set R_Interactive (defined in Rinterface.h) subsequently to change this."
 //
 func SimpleREPL() {
-
-	// setup to retreive the lastexp from the top level callback, if it succeeded.
-	RegisterGetLastTopExpression()
 
 	ReplDLLinit()
 	for {
