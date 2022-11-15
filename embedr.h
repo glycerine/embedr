@@ -11,9 +11,11 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include <Rmath.h> // for RBoolean TRUE / FALSE
 #include <R_ext/Rdynload.h>
 #include <R_ext/Utils.h>
 #include <R_ext/Parse.h>
+#include <R_ext/Callbacks.h>
 #include <Rembedded.h>
 #include <signal.h>
 
@@ -79,6 +81,7 @@ unsigned long int get_signint_handler();
 
   void callEndEmbeddedR();
 
+  void RegisterMyToplevelCallback();
 
 #ifdef __cplusplus
 }

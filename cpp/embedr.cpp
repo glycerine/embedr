@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
+#include <stdio.h>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -282,7 +283,7 @@ extern "C" {
     Rf_endEmbeddedR(0);
   }
 
-
+  // Unrelated to Task Callbacks.
   SEXP CallbackToHandler(SEXP handler_, SEXP arg_, SEXP rho_) {
     SEXP evalres;
     
@@ -295,8 +296,31 @@ extern "C" {
     UNPROTECT(2);
     return evalres;
   }
-  
 
+  // MyEmbedrToplevelCallback is an example of a function that is
+  // registered using Rf_addTaskCallback() to get called after
+  // each toplevel R action.
+  //
+  // Registered TaskCallbacks get called from R's main loop
+  // after each toplevel task (i.e. each expression evaluated at the toplevel).
+  //
+  // If they return FALSE then they are deregistered and not called again.
+  // If they return TRUE then they will be called after the next toplevel
+  // task completes.
+  Rboolean MyEmbedrToplevelCallback(SEXP expr,
+                                    SEXP value,
+                                    Rboolean succeeded,
+                                    Rboolean visible,
+                                    void * data) {
+    
+    printf("MyTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d\n", succeeded);
+    return FALSE; // only take one callback to start.
+  }
+
+  void RegisterMyEmbedrToplevelCallback() {
+    Rf_addTaskCallback(&MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", NULL);
+  }
+  
 #ifdef __cplusplus
 }
 #endif

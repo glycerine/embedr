@@ -110,3 +110,13 @@ func EvalR(script string) (err error) {
 	}
 	return nil
 }
+
+// typedef Rboolean (*R_ToplevelCallback)(SEXP expr, SEXP value, Rboolean succeeded, Rboolean visible, void *);
+
+// Rboolean Rf_removeTaskCallbackByIndex(int id);
+// Rboolean Rf_removeTaskCallbackByName(const char *name);
+// SEXP R_removeTaskCallback(SEXP which);
+// R_ToplevelCallbackEl* Rf_addTaskCallback(R_ToplevelCallback cb, void *data, void (*finalizer)(void *), const char *name, int *pos);
+func RegisterDemoTaskCallback() {
+	C.RegisterMyToplevelCallback()
+}
