@@ -81,7 +81,7 @@ unsigned long int get_signint_handler();
 
   void callEndEmbeddedR();
 
-  void RegisterMyToplevelCallback();
+  void RegisterMyEmbedrToplevelCallback();
 
 #ifdef __cplusplus
 }

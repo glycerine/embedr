@@ -117,6 +117,6 @@ func EvalR(script string) (err error) {
 // Rboolean Rf_removeTaskCallbackByName(const char *name);
 // SEXP R_removeTaskCallback(SEXP which);
 // R_ToplevelCallbackEl* Rf_addTaskCallback(R_ToplevelCallback cb, void *data, void (*finalizer)(void *), const char *name, int *pos);
-func RegisterDemoTaskCallback() {
-	C.RegisterMyToplevelCallback()
+func DemoTaskCallback() {
+	C.RegisterMyEmbedrToplevelCallback()
 }

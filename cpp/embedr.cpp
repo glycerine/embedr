@@ -313,7 +313,7 @@ extern "C" {
                                     Rboolean visible,
                                     void * data) {
     
-    printf("MyTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d\n", succeeded);
+    printf("MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d\n", succeeded);
     return FALSE; // only take one callback to start.
   }
 
