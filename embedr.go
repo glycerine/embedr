@@ -121,7 +121,7 @@ func EvalR(script string) (err error) {
 	return nil
 }
 
-func DemoTaskCallback() {
+func topTaskCallback() {
 	num := C.RegisterMyEmbedrToplevelCallback()
 	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
 }
@@ -136,12 +136,20 @@ func DemoTaskCallback() {
 //  set R_Interactive (defined in Rinterface.h) subsequently to change this."
 //
 func SimpleREPL() {
+
+	// setup to retreive the lastexp from the top level callback, if it succeeded.
+	topTaskCallback()
+
 	C.R_ReplDLLinit()
 	for {
 		did := C.R_ReplDLLdo1()
 		vv("back from one call to R_ReplDLLdo1(); did = %v\n", did)
 		if did <= 0 {
 			break
+		}
+		if C.lastSucessExpression != nil {
+			lastexpr := C.GoString(C.lastSucessExpression)
+			vv("lastexpr = '%v'", lastexpr)
 		}
 		// did == 0 => error evaluating
 		// did == -1 => ctrl-d (end of file).
