@@ -125,17 +125,18 @@ func EvalR(script string) (err error) {
 var mutTaskCallback sync.Mutex
 var taskCallBackInitDone bool
 
-func topTaskCallback() {
+func topTaskCallback() int {
 	// only Register once!
 	mutTaskCallback.Lock()
 	defer mutTaskCallback.Unlock()
 	if taskCallBackInitDone {
-		return
+		return -1
 	}
 	taskCallBackInitDone = true
 
 	num := C.RegisterMyEmbedrToplevelCallback()
-	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
+	//fmt.Printf("topTaskCallback registered and got num = %v\n", num)
+	return int(num)
 }
 
 // or run_Rmainloop(); but one-step R_ReplDLLdo1() is nice
