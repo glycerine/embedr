@@ -125,7 +125,7 @@ func EvalR(script string) (err error) {
 var mutTaskCallback sync.Mutex
 var taskCallBackInitDone bool
 
-func topTaskCallback() int {
+func RegisterGetLastTopExpression() int {
 	// only Register once!
 	mutTaskCallback.Lock()
 	defer mutTaskCallback.Unlock()
@@ -137,6 +137,24 @@ func topTaskCallback() int {
 	num := C.RegisterMyEmbedrToplevelCallback()
 	//fmt.Printf("topTaskCallback registered and got num = %v\n", num)
 	return int(num)
+}
+
+func ReplDLLinit() {
+	C.R_ReplDLLinit()
+}
+func ReplDLLdo1() int {
+	return int(C.R_ReplDLLdo1())
+}
+
+// Return the expression, as a string, from the last evaluation.
+// Returns empty string if last expression gave an error.
+func Lastexpr() string {
+	if C.lastSucessExpression != nil {
+		lastexpr := C.GoString(C.lastSucessExpression)
+		//vv("lastexpr = '%v'", lastexpr)
+		return lastexpr
+	}
+	return ""
 }
 
 // or run_Rmainloop(); but one-step R_ReplDLLdo1() is nice
@@ -151,20 +169,18 @@ func topTaskCallback() int {
 func SimpleREPL() {
 
 	// setup to retreive the lastexp from the top level callback, if it succeeded.
-	topTaskCallback()
+	RegisterGetLastTopExpression()
 
-	C.R_ReplDLLinit()
+	ReplDLLinit()
 	for {
-		did := C.R_ReplDLLdo1()
+		did := ReplDLLdo1()
 		vv("back from one call to R_ReplDLLdo1(); did = %v\n", did)
+		// did == 0 => error evaluating
+		// did == -1 => ctrl-d (end of file).
+
 		if did <= 0 {
 			break
 		}
-		if C.lastSucessExpression != nil {
-			lastexpr := C.GoString(C.lastSucessExpression)
-			vv("lastexpr = '%v'", lastexpr)
-		}
-		// did == 0 => error evaluating
-		// did == -1 => ctrl-d (end of file).
+		vv("lastexpr = '%v'", Lastexpr())
 	}
 }
