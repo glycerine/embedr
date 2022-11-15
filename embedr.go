@@ -111,9 +111,21 @@ func EvalR(script string) (err error) {
 	return nil
 }
 
-/* the embedded DLL appears not to do Task Callbacks.
 func DemoTaskCallback() {
 	num := C.RegisterMyEmbedrToplevelCallback()
 	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
 }
-*/
+
+// or run_Rmainloop(); ?
+// https://cran.r-project.org/doc/manuals/R-exts.html#index-Rf_005finitEmbeddedR
+// section 8.1
+//
+// "Rf_initEmbeddedR sets R to be in interactive mode: you can
+//  set R_Interactive (defined in Rinterface.h) subsequently to change this."
+//
+func SimpleREPL() {
+	C.R_ReplDLLinit()
+	for C.R_ReplDLLdo1() > 0 {
+		fmt.Printf("embedr.go:131 done with one call to R_ReplDLLdo1().\n")
+	}
+}

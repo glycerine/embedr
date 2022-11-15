@@ -297,8 +297,9 @@ extern "C" {
     return evalres;
   }
 
-  /* The DLL does not do these Rf_addTaskCallback() callbacks.
-
+  // This works once a R_ReplDLLinit() / R_ReplDLLdo1() loop
+  // has started, but not before.
+  // 
   // MyEmbedrToplevelCallback is an example of a function that is
   // registered using Rf_addTaskCallback() to get called after
   // each toplevel R action.
@@ -335,7 +336,7 @@ extern "C" {
     Rf_addTaskCallback(MyEmbedrToplevelCallback, str, free, "MyEmbedrToplevelCallback", &mynum);
     return long(mynum);
   }
-  */
+
   
 #ifdef __cplusplus
 }
