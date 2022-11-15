@@ -20,6 +20,16 @@ import (
 func InitR() {
 	C.record_sigaction_to_current_act() // save Go's sigaction
 
+	// WOW. Discovered by not acted upon yet: there is a way
+	// to get R to not set signal handlers!
+	//
+	// from Section 8.1.5 Threading Issues of https://cran.r-project.org/doc/manuals/R-exts.html
+	//
+	// "You may also want to consider how signals are handled: R sets
+	// signal handlers for several signals, including SIGINT, SIGSEGV, SIGPIPE,
+	// SIGUSR1 and SIGUSR2, but these can all be suppressed by setting the
+	// variable R_SignalHandlers (declared in Rinterface.h) to 0."
+
 	// R will change some signal handlers, for SIGPIPE; maybe others.
 	C.callInitEmbeddedR()
 
@@ -116,7 +126,8 @@ func DemoTaskCallback() {
 	fmt.Printf("DemoTaskCallback registered and got num = %v\n", num)
 }
 
-// or run_Rmainloop(); ?
+// or run_Rmainloop(); but this is nice in that we get control back
+// after each top level something (command?)
 // https://cran.r-project.org/doc/manuals/R-exts.html#index-Rf_005finitEmbeddedR
 // section 8.1
 //
@@ -125,7 +136,11 @@ func DemoTaskCallback() {
 //
 func SimpleREPL() {
 	C.R_ReplDLLinit()
-	for C.R_ReplDLLdo1() > 0 {
-		fmt.Printf("embedr.go:131 done with one call to R_ReplDLLdo1().\n")
+	for {
+		did := C.R_ReplDLLdo1()
+		vv("back from one call to R_ReplDLLdo1(); did = %v\n", did)
+		if did == 0 {
+			break
+		}
 	}
 }

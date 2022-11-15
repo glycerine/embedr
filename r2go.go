@@ -452,12 +452,6 @@ func client_main(addr *net.TCPAddr, msg []byte, deadline time.Time) ([]byte, err
 	return replyBytes, nil
 }
 
-func panicOn(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 type MsgpackHelper struct {
 	initialized bool
 	mh          codec.MsgpackHandle
