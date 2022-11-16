@@ -160,7 +160,8 @@ func ReplDLLdo1() int {
 func Lastexpr() string {
 	if C.lastSucessExpression != nil {
 		lastexpr := C.GoString(C.lastSucessExpression)
-		//vv("lastexpr = '%v'", lastexpr)
+		//vv("Lastexpr() sees = '%v'", lastexpr)
+		C.lastSucessExpression = nil
 		return lastexpr
 	}
 	return ""

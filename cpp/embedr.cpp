@@ -344,7 +344,7 @@ extern "C" {
       // 0 the pointer after reading it.
       free(lastSucessExpression); 
       lastSucessExpression = strdup(x);
-      //printf("succeeded: '%s'\n", x);
+      //printf("MyEmbedrToplevelCallback: succeeded: '%s'\n", x);
     }
     // keep calling us for each toplevel, FALSE would unregister the callback.
     return TRUE;
