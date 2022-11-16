@@ -206,8 +206,12 @@ func SimpleREPL() {
 }
 
 // The default R prompt is "> ", but
-// this can be changed.
+// this can be changed. It won't take
+// effect until a top-level action has
+// ocurred, however.
 func SetCustomPrompt(prompt string) {
+	//vv("SetCustomPrompt called with prompt = '%v'", prompt)
+
 	// free of 0 is a no-op.
 	// Release any previously allocated prompt.
 	C.free(unsafe.Pointer(C.customPrompt))

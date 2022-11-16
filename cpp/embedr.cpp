@@ -343,7 +343,7 @@ extern "C" {
 
     //PrintToR("embedr.cpp: MyEmbedrToplevelCallback() has been called!\n");     
     
-    //printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
+    //printf("MyEmbedrTopLevelCallback has been called; The previous expression suceeded = %d;\n", succeeded);
     //fprintf(stderr, "On stderr: MyEmbedrTopLevelCallback has been called; returning FALSE to deregister ourselves! The previous expression suceeded = %d; callcount = %d\n", succeeded, callcount);
     if (succeeded) {
       
@@ -370,15 +370,23 @@ extern "C" {
       //printf("MyEmbedrToplevelCallback: last value: '%s'\n", v);
     }
 
-    if (customPrompt != NULL) {
-      // could not figure out how to call SetOption
+    if (customPrompt == NULL) {
+      //printf("customPrompt was NULL\n");
+    } else {
+      // Could not figure out how to call SetOption
       // from C, so use an R script. Build the
       // script in the static character array
       // setPromptScript.
       //  i.e. we create text saying:
-      // options("prompt" = customPrompt)
+      //
+      // `options("prompt" = "` + customPrompt + `")`
+      //
+      // where customPrompt has been filled in by
+      // the user of this API.
       
       size_t n = strlen(customPrompt); // does not count the trail 0.
+
+      //printf("customPrompt is size %d: '%s'\n", n, customPrompt);
       if (n > 0) {
         
         if (n > 99) {
@@ -403,6 +411,7 @@ extern "C" {
                
         int evalerr = 0;
         callParseEval(setPromptScript, &evalerr);
+        //printf("tried to execute script: '%s'; got evalerr = %d;\n", setPromptScript, evalerr);
                 
       } // end if n > 0
     } // end if customPrompt != NULL
