@@ -347,7 +347,7 @@ extern "C" {
       // 0 the pointer after reading it.
       free(lastSucessExpression); 
       lastSucessExpression = strdup(x);
-      printf("MyEmbedrToplevelCallback: succeeded: '%s'\n", x);
+      //printf("MyEmbedrToplevelCallback: succeeded: '%s'\n", x);
 
       // This works but gives the raw data rather than
       //  the nicely formatted output we usually desire
