@@ -28,6 +28,9 @@ extern "C" {
   // strdup(), and then set it to 0;
   // defined in cpp/embedr.cpp
   extern char* lastSucessExpression;
+
+  // ditto for last value of the last expression.
+  //extern char* lastValue;
   
   // Not in the usualy .h, so how are we to get to them?
   // from src/main/deparse.c

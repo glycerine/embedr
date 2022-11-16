@@ -21,6 +21,9 @@
 // strdup(), and then set it to 0;
 char* lastSucessExpression = 0;
 
+// ditto for last value of the last expression.
+// char* lastValue = 0;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -344,7 +347,20 @@ extern "C" {
       // 0 the pointer after reading it.
       free(lastSucessExpression); 
       lastSucessExpression = strdup(x);
-      //printf("MyEmbedrToplevelCallback: succeeded: '%s'\n", x);
+      printf("MyEmbedrToplevelCallback: succeeded: '%s'\n", x);
+
+      // This works but gives the raw data rather than
+      //  the nicely formatted output we usually desire
+      //  from the presentation by the print commands.
+      //  Since it also can take up alot of memory to
+      //  store a big string representation, and it won't
+      //  be often used, we'll turn this off for now.
+      //
+      // ditto for last value of the last expression.
+      //const char* v = CHAR(STRING_ELT(Rf_deparse1line(value, FALSE), 0));
+      //free(lastValue); 
+      //lastValue = strdup(v);      
+      //printf("MyEmbedrToplevelCallback: last value: '%s'\n", v);
     }
     // keep calling us for each toplevel, FALSE would unregister the callback.
     return TRUE;

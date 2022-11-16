@@ -167,6 +167,18 @@ func Lastexpr() string {
 	return ""
 }
 
+// only gave raw values, not nice print() outputs like we actually want.
+// Since can be slow and hog memory to stringify all output, turn this off.
+// func Lastvalue() string {
+// 	if C.lastValue != nil {
+// 		lastval := C.GoString(C.lastValue)
+// 		vv("Lastvalue() sees = '%v'", lastval)
+// 		C.lastValue = nil
+// 		return lastval
+// 	}
+// 	return ""
+// }
+
 // or run_Rmainloop(); but one-step R_ReplDLLdo1() is nice
 // in that we get control back
 // after each top level something (command?)
