@@ -14,6 +14,7 @@ import "C"
 import (
 	"fmt"
 	"sync"
+	"unsafe"
 	//"github.com/shurcooL/go-goon"
 )
 
@@ -202,4 +203,15 @@ func SimpleREPL() {
 		}
 		vv("lastexpr = '%v'", Lastexpr())
 	}
+}
+
+// The default R prompt is "> ", but
+// this can be changed.
+func SetCustomPrompt(prompt string) {
+	// free of 0 is a no-op.
+	// Release any previously allocated prompt.
+	C.free(unsafe.Pointer(C.customPrompt))
+
+	// malloc and set the new prompt.
+	C.customPrompt = C.CString(prompt)
 }

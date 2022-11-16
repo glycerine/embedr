@@ -21,8 +21,15 @@
 // strdup(), and then set it to 0;
 char* lastSucessExpression = 0;
 
-// ditto for last value of the last expression.
-// char* lastValue = 0;
+// If the client has set a custom prompt here, then show it.
+// custom prompt cannot be larger than 99 bytes.
+// Client should malloc it; and free if they replace with a new one.
+char* customPrompt = 0;
+
+char setPromptScript[128]; // options("prompt"="customPrompt")
+
+char promptScriptPrefix[] = "options(\"prompt\"=\"";
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -362,6 +369,44 @@ extern "C" {
       //lastValue = strdup(v);      
       //printf("MyEmbedrToplevelCallback: last value: '%s'\n", v);
     }
+
+    if (customPrompt != NULL) {
+      // could not figure out how to call SetOption
+      // from C, so use an R script. Build the
+      // script in the static character array
+      // setPromptScript.
+      //  i.e. we create text saying:
+      // options("prompt" = customPrompt)
+      
+      size_t n = strlen(customPrompt); // does not count the trail 0.
+      if (n > 0) {
+        
+        if (n > 99) {
+          n = 99; // stay inside our setPromptScript static array buffer size.
+        }
+
+        // always zero terminated because script is a little
+        // bigger than the prefix + the max 99 characters.
+        bzero(setPromptScript, sizeof(setPromptScript));
+
+        // Our setPromptScript is statically 128 characters. This
+        // should be enough because:
+        // 123456789012345678 => 18 char + 99 custom + 3 = 120 including terminator.
+        // options("prompt"="
+        strcpy(&setPromptScript[0], promptScriptPrefix); 
+
+        size_t pre = strlen(setPromptScript);
+        strncpy(&setPromptScript[pre], customPrompt, n);
+
+        pre = strlen(setPromptScript);
+        strcpy(&setPromptScript[pre], "\")"); // 3 more, including terminating 0.
+               
+        int evalerr = 0;
+        callParseEval(setPromptScript, &evalerr);
+                
+      } // end if n > 0
+    } // end if customPrompt != NULL
+    
     // keep calling us for each toplevel, FALSE would unregister the callback.
     return TRUE;
   }

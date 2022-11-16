@@ -29,6 +29,18 @@ extern "C" {
   // defined in cpp/embedr.cpp
   extern char* lastSucessExpression;
 
+  // Any customPrompt can be at most
+  // 99 characters; If we set it, we own the memory.
+  // So either point to a static string, or take
+  // responsibility for malloc and free of it.
+  // In particular, remember to manage memory
+  // if you need to when you change the
+  // custom prompt.
+  //
+  // Should typically end in "> " which is
+  // the default R prompt.
+  extern char* customPrompt;
+  
   // ditto for last value of the last expression.
   //extern char* lastValue;
   
@@ -38,6 +50,9 @@ extern "C" {
   SEXP Rf_deparse1line_(SEXP call, Rboolean abbrev, int opts);
   SEXP Rf_deparse1line(SEXP call, Rboolean abbrev);
   SEXP Rf_deparse1(SEXP call, Rboolean abbrev, int opts);
+
+  // in src/main/options.c:204 v4.1.0
+  SEXP SetOption(SEXP tag, SEXP value);
   
 int Rf_isProtected(SEXP s); // debugging utility from R-3.x.x/src/main/memory.c
   
