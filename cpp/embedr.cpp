@@ -35,20 +35,21 @@ char promptScriptPrefix[] = "options(\"prompt\"=\"";
 extern "C" {
 #endif
 
+  /* I think these are only for when R is the host. Not when Go is the host.
   // called after the ((constructor)) routines.
   void R_init_embedr(DllInfo *info)
   {
-    /* Register routines,
-       allocate resources. */
+    // Register routines, allocate resources.
     printf("   R_init_embedr() called\n");
   }
   
   // called when R wants to unload.
   void R_unload_embedr(DllInfo *info)
   {
-    /* Release resources. */
+    // Release resources.
     printf("   R_unload_embedr() called\n");
   }
+  */
   
   struct sigaction starting_act[NSIG];
 

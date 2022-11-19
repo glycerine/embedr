@@ -228,7 +228,19 @@ func SetGoCallbackForCleanup(f func()) {
 
 //export GoCleanupFunc
 func GoCleanupFunc() {
-	fmt.Printf("GoCleanupFunc called.\n")
-	cleanupFunc()
-	fmt.Printf("GoCleanupFunc done.\n")
+
+	// This is called at R shutdown time (e.g. user calling q() ) by doing:
+	//
+	// embedr.ReplDLLinit()
+	// embedr.SetGoCallbackForCleanup(func() { /* golang cleanup functions called here. */ })
+	// embedr.EvalR(`.Last.sys=function(){.C("CallGoCleanupFunc")}`)
+	//  then the C code in cpp/embedr.cpp CallGoCleanupFunc() calls us;
+	//  (which is why we have to be exported) and
+	//  then we can call our cleanupFunc.
+
+	//fmt.Printf("GoCleanupFunc called.\n")
+	if cleanupFunc != nil {
+		cleanupFunc()
+	}
+	//fmt.Printf("GoCleanupFunc done.\n")
 }
