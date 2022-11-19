@@ -118,6 +118,8 @@ unsigned long int get_signint_handler();
 
   long RegisterMyEmbedrToplevelCallback();
 
+  void GoCleanupFunc();
+  
 #ifdef __cplusplus
 }
 #endif

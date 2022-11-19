@@ -36,18 +36,18 @@ extern "C" {
 #endif
 
   // called after the ((constructor)) routines.
-  void R_init_rmq(DllInfo *info)
+  void R_init_embedr(DllInfo *info)
   {
     /* Register routines,
        allocate resources. */
-    //printf("   R_init_rmq() called\n");
+    printf("   R_init_embedr() called\n");
   }
   
   // called when R wants to unload.
-  void R_unload_rmq(DllInfo *info)
+  void R_unload_embedr(DllInfo *info)
   {
     /* Release resources. */
-    //printf("   R_unload_rmq() called\n");
+    printf("   R_unload_embedr() called\n");
   }
   
   struct sigaction starting_act[NSIG];
@@ -255,10 +255,25 @@ extern "C" {
     return endx;
   }
 
+
+  void CallGoCleanupFunc() {
+    GoCleanupFunc();
+  }
+  
+  // register CallGoCleanupFunc
+  static const R_CMethodDef cMethods[] = {
+                                          {"CallGoCleanupFunc", (DL_FUNC) &CallGoCleanupFunc, 0, NULL},
+                                          {NULL, NULL, 0, NULL}
+  };
+  
   // Must only call one or other of the init functions; and only once.
   void callInitEmbeddedREPL() {
     char *my_argv[]= {(char*)"repl"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
+
+    DllInfo *info = R_getEmbeddingDllInfo();
+    //R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
+    R_registerRoutines(info, cMethods, NULL, NULL, NULL);
   }
 
   // Must only call one or other of the init functions; and only once.  
@@ -425,7 +440,7 @@ extern "C" {
     Rf_addTaskCallback(MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", &mynum);
     return long(mynum);
   }
-
+  
   
 #ifdef __cplusplus
 }

@@ -219,3 +219,16 @@ func SetCustomPrompt(prompt string) {
 	// malloc and set the new prompt.
 	C.customPrompt = C.CString(prompt)
 }
+
+var cleanupFunc func()
+
+func SetGoCallbackForCleanup(f func()) {
+	cleanupFunc = f
+}
+
+//export GoCleanupFunc
+func GoCleanupFunc() {
+	fmt.Printf("GoCleanupFunc called.\n")
+	cleanupFunc()
+	fmt.Printf("GoCleanupFunc done.\n")
+}
