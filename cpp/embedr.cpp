@@ -308,6 +308,8 @@ extern "C" {
     DllInfo *info = R_getEmbeddingDllInfo();
     //R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
     R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+
+    set_SA_ONSTACK();
   }
 
   // Must only call one or other of the init functions; and only once.  
@@ -315,6 +317,8 @@ extern "C" {
     // designed to be as quiet as possible, when really embedded.
     char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
+
+    set_SA_ONSTACK();
   }
 
   // PRE: callInitEmbeddedR() has been called exactly once before entering.

@@ -151,6 +151,7 @@ func ReplDLLinit() {
 
 	C.R_ReplDLLinit()
 	registerGetLastTopExpression()
+	C.set_SA_ONSTACK()
 }
 func ReplDLLdo1() int {
 	return int(C.R_ReplDLLdo1())
