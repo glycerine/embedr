@@ -24,6 +24,11 @@
 extern "C" {
 #endif
 
+  // readline changes signal handlers all the time, without setting
+  // SA_ONSTACK, which means risk of Go noticing and panicing. Try
+  // to avoid readline.
+  // extern Rboolean UsingReadline; // undefined reference arg.
+  
   // the last successfully evaluated expression from the Toplevel callback
   // The Go code should free() this after copying it, as it was made with
   // strdup(), and then set it to 0;

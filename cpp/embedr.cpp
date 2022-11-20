@@ -300,9 +300,10 @@ extern "C" {
     // You may also want to consider how signals are handled: R sets signal handlers 
     // for several signals, including SIGINT, SIGSEGV, SIGPIPE, SIGUSR1 and SIGUSR2, but these 
     // can all be suppressed by setting the variable R_SignalHandlers (declared in Rinterface.h) to 0.
-    // R_SignalHandlers = 0; // strange. had no effect. but we aren't calling the main loop.
-    
-    char *my_argv[]= {(char*)"repl"};
+    R_SignalHandlers = 0; // strange. had no effect. but we aren't calling the main loop.
+    // Also, crazy readline calls sigaction every line read. Turn it off.
+
+    char *my_argv[]= {(char*)"repl", (char*)"--no-readline"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
     DllInfo *info = R_getEmbeddingDllInfo();
@@ -310,12 +311,15 @@ extern "C" {
     R_registerRoutines(info, cMethods, NULL, NULL, NULL);
 
     set_SA_ONSTACK();
+
   }
 
   // Must only call one or other of the init functions; and only once.  
   void callInitEmbeddedR() {
+
+    R_SignalHandlers = 0;
     // designed to be as quiet as possible, when really embedded.
-    char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
+    char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave", (char*)"--no-readline"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
     set_SA_ONSTACK();
@@ -323,9 +327,14 @@ extern "C" {
 
   // PRE: callInitEmbeddedR() has been called exactly once before entering.
   // IMPORTANT: caller must PROTECT the returned SEXP and unprotect when done. Unless it is R_NilValue.
+  // call set_SA_ONSTACK() at beginning and end:
+  // try to prevent Go seeing signal handlers without ONSTACK, since
+  // the go runtime will panic. Apparently R is setting signal handlers anew
+  // all the time. Arg!
   SEXP callParseEval(const char* evalme, int* evalErrorOccured) {
     SEXP ans,expression, myCmd;
-
+    set_SA_ONSTACK();
+    
     // null(0) would ensure no error is ever reported.
     // evalErrorOccured = 0;
     ParseStatus parseStatusCode;
@@ -344,12 +353,16 @@ extern "C" {
     PROTECT(expression = R_ParseVector(myCmd, 1, &parseStatusCode, R_NilValue));
     if (parseStatusCode != PARSE_OK) {
       UNPROTECT(2);
+
+      set_SA_ONSTACK();  
       return R_NilValue;
     }
 
     ans = R_tryEval(VECTOR_ELT(expression,0), R_GlobalEnv, evalErrorOccured);
     UNPROTECT(2);
     // evalErrorOccured will be 1 if an error happened, and ans will be R_NilValue
+
+    set_SA_ONSTACK();    
     return ans; // caller must protect and unprotect when done
   }
 

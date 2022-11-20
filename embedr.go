@@ -154,6 +154,7 @@ func ReplDLLinit() {
 	C.set_SA_ONSTACK()
 }
 func ReplDLLdo1() int {
+
 	return int(C.R_ReplDLLdo1())
 }
 
