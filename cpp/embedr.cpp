@@ -159,9 +159,9 @@ extern "C" {
       sigaction(i, NULL, &setsa_act[i]); // read them.
       if (setsa_act[i].sa_handler != NULL) {
         
-        printf("set_SA_ONSTACK(): before modifying, setsa_act[%d].sa_flags = %d\n", i, setsa_act[i].sa_flags);
+        //printf("set_SA_ONSTACK(): before modifying, setsa_act[%d].sa_flags = %d\n", i, setsa_act[i].sa_flags);
         setsa_act[i].sa_flags = setsa_act[i].sa_flags | SA_ONSTACK;
-        printf("set_SA_ONSTACK(): _after_ modifying, setsa_act[%d].sa_flags = %d\n", i, setsa_act[i].sa_flags);      
+        //printf("set_SA_ONSTACK(): _after_ modifying, setsa_act[%d].sa_flags = %d\n", i, setsa_act[i].sa_flags);      
 
         sigaction(i, &setsa_act[i], NULL); // write back each in turn.
       }

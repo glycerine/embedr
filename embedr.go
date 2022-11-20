@@ -254,3 +254,12 @@ func Record_sigaction_to_current_act() {
 func Restore_sigaction_from_current_act() {
 	C.restore_sigaction_from_current_act()
 }
+
+func Restore_all_starting_signal_handlers_WITH_SA_ONSTACK() {
+	C.restore_all_starting_signal_handlers_WITH_SA_ONSTACK()
+}
+
+// set the flag on whatever signal handlers are in place.
+func Set_SA_ONSTACK() {
+	C.set_SA_ONSTACK()
+}
