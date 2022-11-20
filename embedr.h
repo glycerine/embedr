@@ -120,6 +120,8 @@ unsigned long int get_signint_handler();
   long RegisterMyEmbedrToplevelCallback();
 
   void GoCleanupFunc();
+
+  void restore_all_starting_signal_handlers_WITH_SA_ONSTACK();
   
 #ifdef __cplusplus
 }

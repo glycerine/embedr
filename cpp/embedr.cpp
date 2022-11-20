@@ -76,6 +76,9 @@ extern "C" {
     // immediately.
     // NO!: PrintToR("interface.cpp: my_init() top.\n"); 
 
+    //R_SignalHandlers = 0; // no chance
+    //printf("embedr.cpp:79 my_init() top.\n");
+    
     // We run in 2 scenarios now (code is re-used):
     // a) Go as host, and we link in the dfs/rmqcb/pkg/embedr
     //    package. At Go host init() time, this here
@@ -107,18 +110,20 @@ extern "C" {
       //
       // So we will set the flag and write them back out,
       // if they have a handler:
-      /*
+      
       if (starting_act[i].sa_handler != NULL) {
         
-        printf("interface.cpp:60 before modifying, starting_act[%d].sa_flags = %d\n", i, starting_act[i].sa_flags);
+        //printf("embedr.cpp:113 before modifying, starting_act[%d].sa_flags = %d\n", i, starting_act[i].sa_flags);
+        /*
         starting_act[i].sa_flags = starting_act[i].sa_flags | SA_ONSTACK;
         printf("interface.cpp:60 _after_ modifying, starting_act[%d].sa_flags = %d\n", i, starting_act[i].sa_flags);      
 
         sigaction(i, &starting_act[i], NULL); // write back each in turn.
       
         printf("interface.cpp:60 starting_act[%d] = %ld\n", i, (unsigned long int)(starting_act[i].sa_handler));
+        */
       }
-      */
+      
     }
 
     /*
@@ -135,6 +140,18 @@ extern "C" {
     }
   }
 
+  void restore_all_starting_signal_handlers_WITH_SA_ONSTACK() {
+    //printf("top of restore_all_starting_signal_handlers_WITH_SA_ONSTACK()\n");
+    for (int i = 0; i < NSIG; i++) {
+      if (starting_act[i].sa_handler != NULL) {
+        starting_act[i].sa_flags = starting_act[i].sa_flags | SA_ONSTACK;
+        sigaction(i, &starting_act[i], NULL); // write back each in turn.
+        //printf("restored orig Go sig handler with SA_ONSTACK for %d\n", i);
+      }
+    }
+  }
+
+  
   struct sigaction setsa_act[NSIG];
   
   void set_SA_ONSTACK() {
@@ -157,14 +174,22 @@ extern "C" {
   void record_sigaction_to_current_act() {
     for (int i = 0; i < NSIG; i++) {
       sigaction(i, NULL, &current_act[i]); // read them.
+
+      //if (current_act[i].sa_handler != NULL) {
+      //printf("record cur:  current_act[%d].sa_handler was not null.\n", i);
+      //}      
     }
   }
   
   void restore_sigaction_from_current_act() {
+    //printf("top of restore_sigaction_from_current_act()\n");
     for (int i = 0; i < NSIG; i++) {
       // maybe also? leave for now b/c used mostly for recording Go's sigaction.
       // current_act[i].sa_flags = current_act[i].sa_flags | SA_ONSTACK;
       
+      //if (current_act[i].sa_handler != NULL) {
+        //printf("restore cur:  current_act[%d].sa_flags = %d\n", i, current_act[i].sa_flags);
+      //}
       sigaction(i, &current_act[i], NULL); // write them.
     }
   }
@@ -275,7 +300,7 @@ extern "C" {
     // You may also want to consider how signals are handled: R sets signal handlers 
     // for several signals, including SIGINT, SIGSEGV, SIGPIPE, SIGUSR1 and SIGUSR2, but these 
     // can all be suppressed by setting the variable R_SignalHandlers (declared in Rinterface.h) to 0.
-    R_SignalHandlers = 0;
+    // R_SignalHandlers = 0; // strange. had no effect. but we aren't calling the main loop.
     
     char *my_argv[]= {(char*)"repl"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);

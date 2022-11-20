@@ -224,6 +224,8 @@ var cleanupFunc func()
 
 func SetGoCallbackForCleanup(f func()) {
 	cleanupFunc = f
+
+	//C.restore_all_starting_signal_handlers_WITH_SA_ONSTACK()
 }
 
 //export GoCleanupFunc
@@ -243,4 +245,12 @@ func GoCleanupFunc() {
 		cleanupFunc()
 	}
 	//fmt.Printf("GoCleanupFunc done.\n")
+}
+
+func Record_sigaction_to_current_act() {
+	C.record_sigaction_to_current_act()
+}
+
+func Restore_sigaction_from_current_act() {
+	C.restore_sigaction_from_current_act()
 }
