@@ -11,6 +11,7 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include <Rinterface.h>
 #include <Rmath.h> // for RBoolean TRUE / FALSE
 #include <R_ext/Rdynload.h>
 #include <R_ext/Utils.h>

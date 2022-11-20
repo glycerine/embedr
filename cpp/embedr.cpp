@@ -269,6 +269,14 @@ extern "C" {
   
   // Must only call one or other of the init functions; and only once.
   void callInitEmbeddedREPL() {
+
+    // https://cran.r-project.org/doc/manuals/R-exts.html#Threading-issues says:
+    //
+    // You may also want to consider how signals are handled: R sets signal handlers 
+    // for several signals, including SIGINT, SIGSEGV, SIGPIPE, SIGUSR1 and SIGUSR2, but these 
+    // can all be suppressed by setting the variable R_SignalHandlers (declared in Rinterface.h) to 0.
+    R_SignalHandlers = 0;
+    
     char *my_argv[]= {(char*)"repl"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
