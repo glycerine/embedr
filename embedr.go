@@ -151,6 +151,12 @@ func ReplDLLinit() {
 
 	C.R_ReplDLLinit()
 	registerGetLastTopExpression()
+
+	// If ReplDLLinit has installed any
+	// signal handlers, make sure they
+	// are using the SA_ONSTACK flag,
+	// or else the go runtime will
+	// panic when it gets a signal.
 	C.set_SA_ONSTACK()
 }
 func ReplDLLdo1() int {
@@ -267,7 +273,8 @@ func Restore_all_starting_signal_handlers_WITH_SA_ONSTACK() {
 	C.restore_all_starting_signal_handlers_WITH_SA_ONSTACK()
 }
 
-// set the flag on whatever signal handlers are in place.
+// set the SA_ONSTACK flag on all signal
+// handlers currently in place.
 func Set_SA_ONSTACK() {
 	C.set_SA_ONSTACK()
 }
