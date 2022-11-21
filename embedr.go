@@ -211,6 +211,9 @@ func SimpleREPL() {
 // this can be changed. It won't take
 // effect until a top-level action has
 // ocurred, however.
+// Calls injectCustomPrompt(), which uses callParseEval,
+// so the R interpreter must already be
+// initialized.
 func SetCustomPrompt(prompt string) {
 	//vv("SetCustomPrompt called with prompt = '%v'", prompt)
 
@@ -220,6 +223,9 @@ func SetCustomPrompt(prompt string) {
 
 	// malloc and set the new prompt.
 	C.customPrompt = C.CString(prompt)
+
+	// uses callParseEval, so the R interpreter must have be initialized.
+	C.injectCustomPrompt()
 }
 
 var cleanupFunc func()

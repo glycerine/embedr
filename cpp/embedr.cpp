@@ -439,6 +439,20 @@ extern "C" {
     if (customPrompt == NULL) {
       //printf("customPrompt was NULL\n");
     } else {
+      injectCustomPrompt();
+    }
+    
+    // keep calling us for each toplevel, FALSE would unregister the callback.
+    return TRUE;
+  }
+
+  void injectCustomPrompt() {
+    
+      if (customPrompt == NULL) {
+          //printf("customPrompt was NULL\n");
+          return;
+      }
+    
       // Could not figure out how to call SetOption
       // from C, so use an R script. Build the
       // script in the static character array
@@ -455,37 +469,33 @@ extern "C" {
       //printf("customPrompt is size %d: '%s'\n", n, customPrompt);
       if (n > 0) {
         
-        if (n > 99) {
-          n = 99; // stay inside our setPromptScript static array buffer size.
-        }
+          if (n > 99) {
+              n = 99; // stay inside our setPromptScript static array buffer size.
+          }
 
-        // always zero terminated because script is a little
-        // bigger than the prefix + the max 99 characters.
-        bzero(setPromptScript, sizeof(setPromptScript));
+          // always zero terminated because script is a little
+          // bigger than the prefix + the max 99 characters.
+          bzero(setPromptScript, sizeof(setPromptScript));
 
-        // Our setPromptScript is statically 128 characters. This
-        // should be enough because:
-        // 123456789012345678 => 18 char + 99 custom + 3 = 120 including terminator.
-        // options("prompt"="
-        strcpy(&setPromptScript[0], promptScriptPrefix); 
-
-        size_t pre = strlen(setPromptScript);
-        strncpy(&setPromptScript[pre], customPrompt, n);
-
-        pre = strlen(setPromptScript);
-        strcpy(&setPromptScript[pre], "\")"); // 3 more, including terminating 0.
-               
-        int evalerr = 0;
-        callParseEval(setPromptScript, &evalerr);
-        //printf("tried to execute script: '%s'; got evalerr = %d;\n", setPromptScript, evalerr);
-                
+          // Our setPromptScript is statically 128 characters. This
+          // should be enough because:
+          // 123456789012345678 => 18 char + 99 custom + 3 = 120 including terminator.
+          // options("prompt"="
+          strcpy(&setPromptScript[0], promptScriptPrefix); 
+          
+          size_t pre = strlen(setPromptScript);
+          strncpy(&setPromptScript[pre], customPrompt, n);
+          
+          pre = strlen(setPromptScript);
+          strcpy(&setPromptScript[pre], "\")"); // 3 more, including terminating 0.
+          
+          int evalerr = 0;
+          callParseEval(setPromptScript, &evalerr);
+          //printf("tried to execute script: '%s'; got evalerr = %d;\n", setPromptScript, evalerr);
+          
       } // end if n > 0
-    } // end if customPrompt != NULL
-    
-    // keep calling us for each toplevel, FALSE would unregister the callback.
-    return TRUE;
   }
-
+  
   long RegisterMyEmbedrToplevelCallback() {
     int mynum = 0;
     Rf_addTaskCallback(MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", &mynum);

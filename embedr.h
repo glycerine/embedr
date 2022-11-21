@@ -127,6 +127,9 @@ unsigned long int get_signint_handler();
   void GoCleanupFunc();
 
   void restore_all_starting_signal_handlers_WITH_SA_ONSTACK();
+
+  // uses callParseEval, so the R interpreter must have be initialized.
+  void injectCustomPrompt();
   
 #ifdef __cplusplus
 }
