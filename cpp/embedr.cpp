@@ -303,7 +303,8 @@ extern "C" {
     R_SignalHandlers = 0; // strange. had no effect. but we aren't calling the main loop.
     // Also, crazy readline calls sigaction every line read. Turn it off.
 
-    char *my_argv[]= {(char*)"repl", (char*)"--no-readline"};
+    //char *my_argv[]= {(char*)"repl", (char*)"--no-readline"};
+    char *my_argv[]= {(char*)"repl"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
     DllInfo *info = R_getEmbeddingDllInfo();
@@ -319,7 +320,8 @@ extern "C" {
 
     R_SignalHandlers = 0;
     // designed to be as quiet as possible, when really embedded.
-    char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave", (char*)"--no-readline"};
+    //char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave", (char*)"--no-readline"};
+    char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
     set_SA_ONSTACK();
