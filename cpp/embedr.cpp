@@ -293,6 +293,7 @@ extern "C" {
   // register CallGoCleanupFunc
   static const R_CMethodDef cMethods[] = {
                                           {"CallGoCleanupFunc", (DL_FUNC) &CallGoCleanupFunc, 0, NULL},
+                                          {"CallRCallbackToGoFunc", (DL_FUNC) &CallRCallbackToGoFunc, 0, NULL},
                                           {NULL, NULL, 0, NULL}
   };
   
