@@ -285,6 +285,10 @@ extern "C" {
   void CallGoCleanupFunc() {
     GoCleanupFunc();
   }
+
+  void CallRCallbackToGoFunc() {
+    RCallbackToGoFunc();
+  }
   
   // register CallGoCleanupFunc
   static const R_CMethodDef cMethods[] = {

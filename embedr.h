@@ -125,7 +125,8 @@ unsigned long int get_signint_handler();
   long RegisterMyEmbedrToplevelCallback();
 
   void GoCleanupFunc();
-
+  void RCallbackToGoFunc();
+  
   void restore_all_starting_signal_handlers_WITH_SA_ONSTACK();
 
   // uses callParseEval, so the R interpreter must have be initialized.

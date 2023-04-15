@@ -280,3 +280,21 @@ func Restore_all_starting_signal_handlers_WITH_SA_ONSTACK() {
 func Set_SA_ONSTACK() {
 	C.set_SA_ONSTACK()
 }
+
+// try having a callback for svv() to save graphs in a loop.
+
+var rCallbackToGoFunc func()
+
+func SetRCallbackToGoFunc(f func()) {
+	rCallbackToGoFunc = f
+}
+
+//export RCallbackToGoFunc
+func RCallbackToGoFunc() {
+
+	//fmt.Printf("rCallbackToGoFunc called.\n")
+	if rCallbackToGoFunc != nil {
+		rCallbackToGoFunc()
+	}
+	//fmt.Printf("rCallbackToGoFunc done.\n")
+}
