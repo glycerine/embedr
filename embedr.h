@@ -126,6 +126,7 @@ unsigned long int get_signint_handler();
 
   void GoCleanupFunc();
   void RCallbackToGoFunc();
+  void RCallbackToGoFuncDvv();
   
   void restore_all_starting_signal_handlers_WITH_SA_ONSTACK();
 

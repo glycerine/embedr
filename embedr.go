@@ -284,17 +284,33 @@ func Set_SA_ONSTACK() {
 // try having a callback for svv() to save graphs in a loop.
 
 var rCallbackToGoFunc func()
+var rCallbackToGoFuncDvv func()
 
 func SetRCallbackToGoFunc(f func()) {
 	rCallbackToGoFunc = f
 }
+func SetRCallbackToGoFuncDvv(f func()) {
+	rCallbackToGoFuncDvv = f
+}
 
 //export RCallbackToGoFunc
 func RCallbackToGoFunc() {
+	// for svv()
 
 	//fmt.Printf("rCallbackToGoFunc called.\n")
 	if rCallbackToGoFunc != nil {
 		rCallbackToGoFunc()
 	}
 	//fmt.Printf("rCallbackToGoFunc done.\n")
+}
+
+//export RCallbackToGoFuncDvv
+func RCallbackToGoFuncDvv() {
+	// for dvv()
+
+	//fmt.Printf("rCallbackToGoFuncDvv called.\n")
+	if rCallbackToGoFuncDvv != nil {
+		rCallbackToGoFuncDvv()
+	}
+	//fmt.Printf("rCallbackToGoFuncDvv done.\n")
 }
