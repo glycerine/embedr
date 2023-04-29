@@ -17,6 +17,7 @@
 #include <R_ext/Utils.h>
 #include <R_ext/Parse.h>
 #include <R_ext/Callbacks.h>
+//include <R_ext/GraphicsDevice.h> // has R_interrupts_pending but won't compile atm.
 #include <Rembedded.h>
 #include <signal.h>
 
@@ -24,6 +25,9 @@
 extern "C" {
 #endif
 
+  // from main.c for simulating ctrl-c. R sets this to 1 on receiving ctrl-c.
+  extern int R_interrupts_pending;
+  
   // readline changes signal handlers all the time, without setting
   // SA_ONSTACK, which means risk of Go noticing and panicing. Try
   // to avoid readline.
@@ -132,6 +136,9 @@ unsigned long int get_signint_handler();
 
   // uses callParseEval, so the R interpreter must have be initialized.
   void injectCustomPrompt();
+
+  // try to emulate ctrl-c in a safe way (without crashing via cgo).
+  void setR_interrupts_pending();
   
 #ifdef __cplusplus
 }

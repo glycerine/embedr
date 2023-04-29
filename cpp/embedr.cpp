@@ -513,7 +513,11 @@ extern "C" {
     Rf_addTaskCallback(MyEmbedrToplevelCallback, NULL, NULL, "MyEmbedrToplevelCallback", &mynum);
     return long(mynum);
   }
-  
+
+  void setR_interrupts_pending() {
+    R_interrupts_pending = 1;
+  }
+
   
 #ifdef __cplusplus
 }

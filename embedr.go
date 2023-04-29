@@ -293,6 +293,10 @@ func SetRCallbackToGoFuncDvv(f func()) {
 	rCallbackToGoFuncDvv = f
 }
 
+func SetR_interrupts_pending() {
+	C.setR_interrupts_pending()
+}
+
 //export RCallbackToGoFunc
 func RCallbackToGoFunc() {
 	// for svv()
