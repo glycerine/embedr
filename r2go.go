@@ -8,7 +8,8 @@ package embedr
 //
 
 /*
-#cgo LDFLAGS: -L/usr/local/lib64/R/lib -lm -lR ${SRCDIR}/libembedr.a
+#cgo linux LDFLAGS: -L/usr/local/lib64/R/lib -lm -lR ${SRCDIR}/libembedr.a
+#cgo darwin LDFLAGS: -L/Library/Frameworks/R.framework/Versions/Current/Resources/lib -lm -lR ${SRCDIR}/libembedr.a
 #cgo CFLAGS: -I${SRCDIR}/../include -I/usr/share/R/include
 #include <string.h>
 #include <signal.h>

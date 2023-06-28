@@ -1,4 +1,4 @@
-//go:build !linux
+//go:build !linux && !darwin
 package embedr
 
 // requires -lreadline on linux, not sure that is available elsewhere.
