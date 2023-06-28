@@ -21,6 +21,11 @@
 #include <Rembedded.h>
 #include <signal.h>
 
+// access the gnu readline's history directly
+// rather than having to write it to a file each time.
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -139,6 +144,9 @@ unsigned long int get_signint_handler();
 
   // try to emulate ctrl-c in a safe way (without crashing via cgo).
   void setR_interrupts_pending();
+
+  // get the last history line from R via readline's history lib
+  char* last_history();
   
 #ifdef __cplusplus
 }

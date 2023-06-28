@@ -16,6 +16,7 @@
 
 #include "../embedr.h"
 
+
 // the last successfully evaluated expression from the Toplevel callback
 // The Go code should free() this after copying it, as it was made with
 // strdup(), and then set it to 0;
@@ -518,6 +519,21 @@ extern "C" {
     R_interrupts_pending = 1;
   }
 
+  char* last_history() {
+    if (history_length == 0) {
+      return NULL;
+    }
+
+    // contrary to the docs, we have to ask for history_length to
+    // get the most recent command, not history_length - 1;
+    //HIST_ENTRY* h = history_get(history_length-1);
+    HIST_ENTRY* h = history_get(history_length);
+    if (h == NULL) {
+      return NULL;
+    }
+    return h->line;
+  }
+  
   
 #ifdef __cplusplus
 }
