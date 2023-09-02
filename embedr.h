@@ -91,6 +91,8 @@ unsigned long int get_signint_handler();
 
   void null_out_all_signal_handlers();
   void record_sigaction_to_current_act_and_null_out();
+
+  int wrapReplDLLdo1();  
   
   SEXP rmq(SEXP name_);
   

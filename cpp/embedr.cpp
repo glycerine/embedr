@@ -331,6 +331,8 @@ extern "C" {
   // Must only call one or other of the init functions; and only once.
   void callInitEmbeddedREPL() {
 
+    record_sigaction_to_current_act_and_null_out();
+    
     // https://cran.r-project.org/doc/manuals/R-exts.html#Threading-issues says:
     //
     // You may also want to consider how signals are handled: R sets signal handlers 
@@ -347,20 +349,20 @@ extern "C" {
     //R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
     R_registerRoutines(info, cMethods, NULL, NULL, NULL);
 
-    set_SA_ONSTACK();
-
+    restore_sigaction_from_current_act(); // restore Go's sigaction    
   }
 
   // Must only call one or other of the init functions; and only once.  
   void callInitEmbeddedR() {
-
+    record_sigaction_to_current_act_and_null_out();
+    
     R_SignalHandlers = 0;
     // designed to be as quiet as possible, when really embedded.
     //char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave", (char*)"--no-readline"};
     char *my_argv[]= {(char*)"r.embedded.in.golang", (char*)"--silent", (char*)"--vanilla", (char*)"--slave"};
     Rf_initEmbeddedR(sizeof(my_argv)/sizeof(my_argv[0]), my_argv);
 
-    set_SA_ONSTACK();
+    restore_sigaction_from_current_act(); // restore Go's sigaction    
   }
 
   // PRE: callInitEmbeddedR() has been called exactly once before entering.
@@ -372,6 +374,8 @@ extern "C" {
   SEXP callParseEval(const char* evalme, int* evalErrorOccured) {
     SEXP ans,expression, myCmd;
     set_SA_ONSTACK();
+    record_sigaction_to_current_act(); // save host Go's sigaction
+    null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
     
     // null(0) would ensure no error is ever reported.
     // evalErrorOccured = 0;
@@ -392,7 +396,8 @@ extern "C" {
     if (parseStatusCode != PARSE_OK) {
       UNPROTECT(2);
 
-      set_SA_ONSTACK();  
+      //set_SA_ONSTACK();
+      restore_sigaction_from_current_act(); // restore host Go's sigaction      
       return R_NilValue;
     }
 
@@ -400,7 +405,8 @@ extern "C" {
     UNPROTECT(2);
     // evalErrorOccured will be 1 if an error happened, and ans will be R_NilValue
 
-    set_SA_ONSTACK();    
+    //set_SA_ONSTACK();
+    restore_sigaction_from_current_act(); // restore host Go's sigaction          
     return ans; // caller must protect and unprotect when done
   }
 
@@ -542,6 +548,14 @@ extern "C" {
 
   void setR_interrupts_pending() {
     R_interrupts_pending = 1;
+  }
+
+  int wrapReplDLLdo1() {
+    record_sigaction_to_current_act(); // save host Go's sigaction
+    null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
+    int res = R_ReplDLLdo1();
+    restore_sigaction_from_current_act(); // restore host Go's sigaction
+    return res;
   }
   
 #ifdef __cplusplus

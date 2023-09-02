@@ -5,6 +5,7 @@ package embedr
 #include "embedr.h"
 
   // requires -lreadline so making it linux only for the moment.
+  // update, maybe -ledit on darwin works too, modulo signal troubles.
   char* last_history() {
     if (history_length == 0) {
       return NULL;

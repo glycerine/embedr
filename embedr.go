@@ -22,7 +22,15 @@ import (
 
 // as separate functions for using rmqcb as a library
 func InitR(repl bool) {
-	C.record_sigaction_to_current_act() // save Go's sigaction
+
+	// These are moved into the C routines so
+	// that we are already across the cgo boundary
+	// and running C code before we remove the Go signal
+	// handlers with the hope that if the Go stack needed
+	// to grow before our call/make the CGO call, that can happen.
+	//
+	//C.record_sigaction_to_current_act() // save Go's sigaction
+	//Record_sigaction_to_current_act_and_null_out() // save and null out so no Go signal handlers
 
 	// WOW. Discovered: there is a way
 	// to get R to not set signal handlers!
@@ -71,7 +79,8 @@ func InitR(repl bool) {
 	//  and therefore set up an alternate signal stack."
 	C.record_sigaction_to_my_r_act()
 
-	C.restore_sigaction_from_current_act() // restore Go's sigaction
+	// moved inside C.callInitEmbeddedR() and C.callInitEmbeddedREPL()
+	//C.restore_sigaction_from_current_act() // restore Go's sigaction
 
 	// This sequence got us green tests again in dfs/dtc,
 	// rather than core dumps on go test -v there. Well,
@@ -164,17 +173,21 @@ func ReplDLLinit() {
 
 func ReplDLLdo1() (res int) {
 
+	// update: moved these into the C embedr.cpp to
+	// try and get across cgo border without needing
+	// signals that would grow Go/C stack.
+	//
 	// Try to erase all pointers into Go code/the Go runtime
 	// in the signal handling stuff that the kernel is aware of,
 	// with the aim that the Go runtime should
 	// never sees a stray signal inadvertantly (try to eliminate races)
 	// before them back in sanely (and with SA_ONSTACK).
-	Record_sigaction_to_current_act_and_null_out()
+	//Record_sigaction_to_current_act_and_null_out()
 
-	res = int(C.R_ReplDLLdo1())
+	res = int(C.wrapReplDLLdo1())
 
 	// restore any signal handlers that we had.
-	Restore_sigaction_from_current_act()
+	//Restore_sigaction_from_current_act()
 	return
 }
 
