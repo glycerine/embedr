@@ -88,7 +88,9 @@ unsigned long int get_signint_handler();
   void record_sigaction_to_my_r_act();
   void restore_sigaction_from_my_r_act();
   extern struct sigaction my_r_act[NSIG];
-  
+
+  void null_out_all_signal_handlers();
+  void record_sigaction_to_current_act_and_null_out();
   
   SEXP rmq(SEXP name_);
   

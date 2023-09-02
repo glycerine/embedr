@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h> // bzero
 #include <signal.h>
 
 #include "../embedr.h"
@@ -152,6 +153,30 @@ extern "C" {
     }
   }
 
+  // we want to make sure no Go signal handlers are ever called;
+  // so restore all signal handling to newborn process defaults.
+  void null_out_all_signal_handlers() {
+    // man sigaction: "A signal-specific default action may be reset by setting sa_handler to SIG_DFL."
+
+    struct sigaction defaulter;
+    bzero(&defaulter, sizeof(defaulter));
+    defaulter.sa_handler = SIG_DFL; // defined as 0/null, but anyway, be future proof.
+        
+    for (int i = 0; i < NSIG; i++) {      
+      if (i == SIGKILL || i ==  SIGSTOP) {
+           // these cannot be set, will give error, so do not bother.
+        } else {
+           sigaction(i, &defaulter, NULL);
+      }
+    }
+  }
+
+  // common combo, avoid one more cgo boundary crossing.
+  void record_sigaction_to_current_act_and_null_out() {
+    record_sigaction_to_current_act();
+    null_out_all_signal_handlers();
+  }
+  
   
   struct sigaction setsa_act[NSIG];
   
@@ -185,8 +210,8 @@ extern "C" {
   void restore_sigaction_from_current_act() {
     //printf("top of restore_sigaction_from_current_act()\n");
     for (int i = 0; i < NSIG; i++) {
-      // maybe also? leave for now b/c used mostly for recording Go's sigaction.
-      // current_act[i].sa_flags = current_act[i].sa_flags | SA_ONSTACK;
+      // make sure Go runtime will be happy if at all possible.
+      current_act[i].sa_flags = current_act[i].sa_flags | SA_ONSTACK;
       
       //if (current_act[i].sa_handler != NULL) {
         //printf("restore cur:  current_act[%d].sa_flags = %d\n", i, current_act[i].sa_flags);
@@ -206,7 +231,7 @@ extern "C" {
   void restore_sigaction_from_my_r_act() {
     for (int i = 0; i < NSIG; i++) {
       // maybe?
-      // my_r_act[i].sa_flags = my_r_act[i].sa_flags | SA_ONSTACK;
+      my_r_act[i].sa_flags = my_r_act[i].sa_flags | SA_ONSTACK;
       
       sigaction(i, &my_r_act[i], NULL); // write them.
     }
@@ -312,7 +337,7 @@ extern "C" {
     // for several signals, including SIGINT, SIGSEGV, SIGPIPE, SIGUSR1 and SIGUSR2, but these 
     // can all be suppressed by setting the variable R_SignalHandlers (declared in Rinterface.h) to 0.
     R_SignalHandlers = 0; // strange. had no effect. but we aren't calling the main loop.
-    // Also, crazy readline calls sigaction every line read. Turn it off.
+    // Also, crazy readline calls sigaction every line read. Turn it off. Arg. We could not without making the R command line unusable.
 
     //char *my_argv[]= {(char*)"repl", (char*)"--no-readline"};
     char *my_argv[]= {(char*)"repl"};

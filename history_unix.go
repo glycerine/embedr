@@ -17,7 +17,7 @@ package embedr
     if (h == NULL) {
       return NULL;
     }
-    return h->line;
+    return (char*)(h->line);
   }
 */
 import "C"

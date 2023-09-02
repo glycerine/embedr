@@ -24,7 +24,7 @@ import (
 func InitR(repl bool) {
 	C.record_sigaction_to_current_act() // save Go's sigaction
 
-	// WOW. Discovered by not acted upon yet: there is a way
+	// WOW. Discovered: there is a way
 	// to get R to not set signal handlers!
 	//
 	// from Section 8.1.5 Threading Issues of https://cran.r-project.org/doc/manuals/R-exts.html
@@ -161,9 +161,21 @@ func ReplDLLinit() {
 	// panic when it gets a signal.
 	C.set_SA_ONSTACK()
 }
-func ReplDLLdo1() int {
 
-	return int(C.R_ReplDLLdo1())
+func ReplDLLdo1() (res int) {
+
+	// Try to erase all pointers into Go code/the Go runtime
+	// in the signal handling stuff that the kernel is aware of,
+	// with the aim that the Go runtime should
+	// never sees a stray signal inadvertantly (try to eliminate races)
+	// before them back in sanely (and with SA_ONSTACK).
+	Record_sigaction_to_current_act_and_null_out()
+
+	res = int(C.R_ReplDLLdo1())
+
+	// restore any signal handlers that we had.
+	Restore_sigaction_from_current_act()
+	return
 }
 
 // Return the expression, as a string, from the last evaluation.
@@ -263,8 +275,16 @@ func GoCleanupFunc() {
 	//fmt.Printf("GoCleanupFunc done.\n")
 }
 
+func Null_out_all_signal_handlers() {
+	C.null_out_all_signal_handlers()
+}
+
 func Record_sigaction_to_current_act() {
 	C.record_sigaction_to_current_act()
+}
+
+func Record_sigaction_to_current_act_and_null_out() {
+	C.record_sigaction_to_current_act_and_null_out()
 }
 
 func Restore_sigaction_from_current_act() {
