@@ -292,12 +292,20 @@ func Null_out_all_signal_handlers() {
 	C.null_out_all_signal_handlers()
 }
 
+func Null_out_sigwinch() {
+	C.null_out_sigwinch()
+}
+
 func Record_sigaction_to_current_act() {
 	C.record_sigaction_to_current_act()
 }
 
 func Record_sigaction_to_current_act_and_null_out() {
 	C.record_sigaction_to_current_act_and_null_out()
+}
+
+func Record_sigaction_to_current_act_and_null_sigwinch() {
+	C.record_sigaction_to_current_act_and_null_sigwinch()
 }
 
 func Restore_sigaction_from_current_act() {

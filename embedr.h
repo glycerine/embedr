@@ -90,7 +90,9 @@ unsigned long int get_signint_handler();
   extern struct sigaction my_r_act[NSIG];
 
   void null_out_all_signal_handlers();
+  void null_out_sigwinch();  
   void record_sigaction_to_current_act_and_null_out();
+  void record_sigaction_to_current_act_and_null_sigwinch();
 
   int wrapReplDLLdo1();  
   

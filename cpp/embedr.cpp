@@ -153,6 +153,16 @@ extern "C" {
     }
   }
 
+  // I think we went overboard with null_out_all_signal_handlers(),
+  // since then the guest Go runtime hangs. Try just clearing
+  // the troublesome SIGWINCH
+  void null_out_sigwinch() {
+    struct sigaction defaulter;
+    bzero(&defaulter, sizeof(defaulter));
+    defaulter.sa_handler = SIG_DFL; // defined as 0/null, but anyway, be future proof.
+    sigaction(SIGWINCH, &defaulter, NULL);
+  }
+  
   // we want to make sure no Go signal handlers are ever called;
   // so restore all signal handling to newborn process defaults.
   void null_out_all_signal_handlers() {
@@ -176,7 +186,11 @@ extern "C" {
     record_sigaction_to_current_act();
     null_out_all_signal_handlers();
   }
-  
+
+  void record_sigaction_to_current_act_and_null_sigwinch() {
+    record_sigaction_to_current_act();
+    null_out_sigwinch();
+  } 
   
   struct sigaction setsa_act[NSIG];
   
@@ -331,7 +345,8 @@ extern "C" {
   // Must only call one or other of the init functions; and only once.
   void callInitEmbeddedREPL() {
 
-    record_sigaction_to_current_act_and_null_out();
+    //record_sigaction_to_current_act_and_null_out();
+    record_sigaction_to_current_act_and_null_sigwinch();
     
     // https://cran.r-project.org/doc/manuals/R-exts.html#Threading-issues says:
     //
@@ -354,7 +369,8 @@ extern "C" {
 
   // Must only call one or other of the init functions; and only once.  
   void callInitEmbeddedR() {
-    record_sigaction_to_current_act_and_null_out();
+    //record_sigaction_to_current_act_and_null_out();
+    record_sigaction_to_current_act_and_null_sigwinch();
     
     R_SignalHandlers = 0;
     // designed to be as quiet as possible, when really embedded.
@@ -374,8 +390,9 @@ extern "C" {
   SEXP callParseEval(const char* evalme, int* evalErrorOccured) {
     SEXP ans,expression, myCmd;
     set_SA_ONSTACK();
-    record_sigaction_to_current_act(); // save host Go's sigaction
-    null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
+    //record_sigaction_to_current_act(); // save host Go's sigaction
+    //null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
+    record_sigaction_to_current_act_and_null_sigwinch();    
     
     // null(0) would ensure no error is ever reported.
     // evalErrorOccured = 0;
@@ -551,8 +568,9 @@ extern "C" {
   }
 
   int wrapReplDLLdo1() {
-    record_sigaction_to_current_act(); // save host Go's sigaction
-    null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
+    //record_sigaction_to_current_act(); // save host Go's sigaction
+    //null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.
+    record_sigaction_to_current_act_and_null_sigwinch();    
     int res = R_ReplDLLdo1();
     restore_sigaction_from_current_act(); // restore host Go's sigaction
     return res;
