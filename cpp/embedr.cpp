@@ -161,11 +161,18 @@ extern "C" {
     struct sigaction defaulter;
     bzero(&defaulter, sizeof(defaulter));
     defaulter.sa_handler = SIG_DFL; // defined as 0/null, but anyway, be future proof.
-        
+
+    struct sigaction mySigIntAction;
+    bzero(&mySigIntAction, sizeof(mySigIntAction));    
+    mySigIntAction.sa_handler = &sig_handler_for_sigint_R;
+    mySigIntAction.sa_flags = SA_ONSTACK;
+	
     for (int i = 0; i < NSIG; i++) {      
       if (i == SIGKILL || i ==  SIGSTOP) {
            // these cannot be set, will give error, so do not bother.
-        } else {
+      } else if (i == SIGINT) {
+  	   sigaction(i, &mySigIntAction, NULL);
+      } else {
            sigaction(i, &defaulter, NULL);
       }
     }
@@ -550,6 +557,11 @@ extern "C" {
     R_interrupts_pending = 1;
   }
 
+  // try to setup C handling of ctrl-c directly without Go intermediating.
+  void sig_handler_for_sigint_R(int signo) {
+     R_interrupts_pending = 1;
+  }
+  
   int wrapReplDLLdo1() {
     record_sigaction_to_current_act(); // save host Go's sigaction
     null_out_all_signal_handlers();    // don't allow os to call to host Go runtime on signal.

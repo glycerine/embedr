@@ -151,6 +151,9 @@ unsigned long int get_signint_handler();
 
   // get the last history line from R via readline's history lib
   char* last_history();
+
+  // try to setup C handling of ctrl-c directly without Go intermediating.
+  void sig_handler_for_sigint_R(int signo);
   
 #ifdef __cplusplus
 }
