@@ -222,8 +222,8 @@ func Lastexpr() string {
 // section 8.1
 //
 // "Rf_initEmbeddedR sets R to be in interactive mode: you can
-//  set R_Interactive (defined in Rinterface.h) subsequently to change this."
 //
+//	set R_Interactive (defined in Rinterface.h) subsequently to change this."
 func SimpleREPL() {
 
 	ReplDLLinit()
@@ -318,12 +318,16 @@ func Set_SA_ONSTACK() {
 
 var rCallbackToGoFunc func()
 var rCallbackToGoFuncDvv func()
+var rCallbackToGoFuncSetWebData func()
 
 func SetRCallbackToGoFunc(f func()) {
 	rCallbackToGoFunc = f
 }
 func SetRCallbackToGoFuncDvv(f func()) {
 	rCallbackToGoFuncDvv = f
+}
+func SetRCallbackToGoFuncSetWebData(f func()) {
+	rCallbackToGoFuncSetWebData = f
 }
 
 func SetR_interrupts_pending() {
@@ -350,4 +354,15 @@ func RCallbackToGoFuncDvv() {
 		rCallbackToGoFuncDvv()
 	}
 	//fmt.Printf("rCallbackToGoFuncDvv done.\n")
+}
+
+//export RCallbackToGoFuncSetWebData
+func RCallbackToGoFuncSetWebData() {
+	// for dvv()
+
+	//fmt.Printf("rCallbackToGoFuncSetWebData called.\n")
+	if rCallbackToGoFuncSetWebData != nil {
+		rCallbackToGoFuncSetWebData()
+	}
+	//fmt.Printf("rCallbackToGoFuncSetWebData done.\n")
 }

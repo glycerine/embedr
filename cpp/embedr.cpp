@@ -326,12 +326,17 @@ extern "C" {
   void CallRCallbackToGoFuncDvv() {
     RCallbackToGoFuncDvv();
   }
+
+  void CallRCallbackToGoFuncSetWebData() {
+    RCallbackToGoFuncSetWebData();
+  }
   
   // register CallGoCleanupFunc
   static const R_CMethodDef cMethods[] = {
                                           {"CallGoCleanupFunc", (DL_FUNC) &CallGoCleanupFunc, 0, NULL},
                                           {"CallRCallbackToGoFunc", (DL_FUNC) &CallRCallbackToGoFunc, 0, NULL},
                                           {"CallRCallbackToGoFuncDvv", (DL_FUNC) &CallRCallbackToGoFuncDvv, 0, NULL},
+                                          {"CallRCallbackToGoFuncSetWebData", (DL_FUNC) &CallRCallbackToGoFuncSetWebData, 0, NULL},
                                           {NULL, NULL, 0, NULL}
   };
   
