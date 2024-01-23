@@ -1,8 +1,7 @@
 // -*- mode: C++; c-indent-level: 2; c-basic-offset: 2; tab-width: 8 -*-
 ///////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2014 Jason E. Aten                                      //
-// License: Apache 2.0.                                                  //
-// http://www.apache.org/licenses/                                       //
+// License: MIT
 ///////////////////////////////////////////////////////////////////////////
 
 

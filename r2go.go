@@ -1,10 +1,8 @@
 package embedr
 
-// derived from ../../src/rmqcb/rmqcb.go
-
 //
 // Copyright 2015 Jason E. Aten
-// License: Apache 2.0. http://www.apache.org/licenses/LICENSE-2.0
+// License: MIT
 //
 
 /*
@@ -71,8 +69,6 @@ func getTimeoutMsec(timeout_msec_ C.SEXP) (int, error) {
 
 var upgrader = websocket.Upgrader{} // use default options
 
-//export ListenAndServe
-//
 // ListenAndServe is the server part that expects calls from client
 // in the form of RmqWebsocketCall() invocations.
 // The underlying websocket library is the battle tested
@@ -117,6 +113,7 @@ var upgrader = websocket.Upgrader{} // use default options
 // as allowing the go runtime to see any signals just
 // creates heartache and crashes.
 //
+//export ListenAndServe
 func ListenAndServe(addr_ C.SEXP, handler_ C.SEXP, rho_ C.SEXP) C.SEXP {
 
 	addr, err := getAddr(addr_)
@@ -289,8 +286,6 @@ func ListenAndServe(addr_ C.SEXP, handler_ C.SEXP, rho_ C.SEXP) C.SEXP {
 	}
 }
 
-//export RmqWebsocketCall
-//
 // RmqWebsocketCall() is the client part that talks to
 // the server part waiting in ListenAndServe().
 // ListenAndServe is the server part that expects calls from client
@@ -313,6 +308,7 @@ func ListenAndServe(addr_ C.SEXP, handler_ C.SEXP, rho_ C.SEXP) C.SEXP {
 // so do be sure to give it some sane timeout. The
 // default is 5000 msec (5 seconds).
 //
+//export RmqWebsocketCall
 func RmqWebsocketCall(addr_ C.SEXP, msg_ C.SEXP, timeout_msec_ C.SEXP) C.SEXP {
 
 	addr, err := getAddr(addr_)
@@ -522,7 +518,6 @@ var panicErrIntro = "rmq.decodeHelper detected malformed msgpack panic: "
 //
 // if jsonHeuristicDecode then we'll treat raw []byte that
 // start with '{' as JSON and try to decode them too.
-//
 func decodeHelper(r interface{}, depth int, jsonHeuristicDecode bool) (s C.SEXP) {
 
 	defer func() {
@@ -742,8 +737,6 @@ func decodeHelper(r interface{}, depth int, jsonHeuristicDecode bool) (s C.SEXP)
 	return s
 }
 
-//export FromMsgpack
-//
 // FromMsgpack converts a serialized RAW vector of of msgpack2
 // encoded bytes into an R object. We use msgpack2 so that there is
 // a difference between strings (utf8 encoded) and binary blobs
@@ -751,6 +744,7 @@ func decodeHelper(r interface{}, depth int, jsonHeuristicDecode bool) (s C.SEXP)
 // is the awesome https://github.com/ugorji/go/tree/master/codec
 // library from Ugorji Nwoke.
 //
+//export FromMsgpack
 func FromMsgpack(s C.SEXP) C.SEXP {
 	// starting from within R, we convert a raw byte vector into R structures.
 
@@ -770,8 +764,6 @@ func FromMsgpack(s C.SEXP) C.SEXP {
 	return decodeMsgpackToR(bytes)
 }
 
-//export ToMsgpack
-//
 // ToMsgpack converts an R object into serialized RAW vector
 // of msgpack2 encoded bytes. We use msgpack2 so that there is
 // a difference between strings (utf8 encoded) and binary blobs
@@ -779,6 +771,7 @@ func FromMsgpack(s C.SEXP) C.SEXP {
 // is the awesome https://github.com/ugorji/go/tree/master/codec
 // library from Ugorji Nwoke.
 //
+//export ToMsgpack
 func ToMsgpack(s C.SEXP) C.SEXP {
 	byteSlice := encodeRIntoMsgpack(s)
 
@@ -983,12 +976,11 @@ func makeSortedSlicesFromMap(m map[string]interface{}) ([]string, []interface{})
 	return key, val
 }
 
-//export ReadMsgpackFrame
-//
 // ReadMsgpackFrame reads the msgpack frame at byteOffset in rawStream, decodes the
 // 2-5 bytes of a msgpack binary array (either bin8, bin16, or bin32), and returns
 // and the decoded-into-R object and the next byteOffset to use.
 //
+//export ReadMsgpackFrame
 func ReadMsgpackFrame(rawStream C.SEXP, byteOffset C.SEXP) C.SEXP {
 
 	var start int
@@ -1072,13 +1064,12 @@ func DecodeMsgpackBinArrayHeader(p []byte) (headerSize int, payloadSize int, tot
 	return
 }
 
-//export ReadNewlineDelimJson
-//
 // ReadNewlineDelimJson reads a json object at byteOffset in rawStream, expects
 // it to be newline terminated, and returns the
 // decoded-into-R object and the next byteOffset to use (the byte just after
 // the terminating newline).
 //
+//export ReadNewlineDelimJson
 func ReadNewlineDelimJson(rawStream C.SEXP, byteOffset C.SEXP) C.SEXP {
 	C.Rf_protect(rawStream)
 
