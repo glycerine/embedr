@@ -3,7 +3,7 @@ package embedr
 /*
 #cgo windows LDFLAGS: -L/usr/local/lib64/R/lib -lm -lR ${SRCDIR}/libembedr.a
 #cgo windows CFLAGS: -I${SRCDIR}/../include -IC:/cygwin64/usr/share/R/include -IC:/cygwin64/usr/share/R/gnuwin32/fixed/h
-#cgo linux LDFLAGS: -L/usr/local/lib64/R/lib -lm -lR ${SRCDIR}/libembedr.a -lreadline
+#cgo linux LDFLAGS: -L/usr/local/lib64/R/lib -L/usr/local/lib/R/lib -lm -lR ${SRCDIR}/libembedr.a -lreadline
 #cgo linux CFLAGS: -I${SRCDIR}/../include -I/usr/share/R/include
 #cgo darwin LDFLAGS: -L/Library/Frameworks/R.framework/Versions/Current/Resources/lib -lm -lR -ledit
 #cgo darwin CFLAGS: -I${SRCDIR}/../include -I/Library/Frameworks/R.framework/Versions/Current/Headers
