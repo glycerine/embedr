@@ -1,9 +1,13 @@
 package embedr
 
+// R CMD config --ldflags
+// shows:
+// -Wl,--export-dynamic -fopenmp -Wl,--export-dynamic -Wl,--whole-archive /usr/local/lib/R/lib/libR.a -Wl,--no-whole-archive -L/usr/local/lib/R/lib -lRblas -L/usr/lib/gcc/x86_64-linux-gnu/11 -lgfortran -lm -lquadmath -lreadline -lpcre2-8 -ldeflate -lzstd -llzma -lbz2 -lz -lrt -ldl -lm -licuuc -licui18n
+
 /*
 #cgo windows LDFLAGS: -L/usr/local/lib64/R/lib -lm -lR ${SRCDIR}/libembedr.a
 #cgo windows CFLAGS: -I${SRCDIR}/../include -IC:/cygwin64/usr/share/R/include -IC:/cygwin64/usr/share/R/gnuwin32/fixed/h
-#cgo linux LDFLAGS: -L/usr/local/lib64/R/lib -L/usr/local/lib/R/lib -lm -lR ${SRCDIR}/libembedr.a -lreadline
+#cgo linux LDFLAGS: -L/usr/local/lib64/R/lib -L/usr/local/lib/R/lib -lm -lR -lRblas -lRlapack ${SRCDIR}/libembedr.a -lreadline /usr/local/lib/R/lib/libR.a -lm -lquadmath -lreadline -lpcre2-8 -ldeflate -lzstd -llzma -lbz2 -lz -lrt -ldl -lm -licuuc -licui18n -lgomp
 #cgo linux CFLAGS: -I${SRCDIR}/../include -I/usr/share/R/include
 #cgo darwin LDFLAGS: -L/Library/Frameworks/R.framework/Versions/Current/Resources/lib -lm -lR -ledit
 #cgo darwin CFLAGS: -I${SRCDIR}/../include -I/Library/Frameworks/R.framework/Versions/Current/Headers
